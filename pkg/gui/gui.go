@@ -27,7 +27,8 @@ func RunAppGUI() {
 	}
 
 	log.Printf("Connected to IMAP server")
-	showLoginPage(w, c)
+	// showLoginPage(w, c)
+	showMainContent(w, c)
 	w.ShowAndRun()
 }
 
@@ -75,10 +76,23 @@ func loginFunc(w fyne.Window, c *imapclient.Client, username string, password st
 }
 
 func showMainContent(w fyne.Window, c *imapclient.Client) {
-	welcomeLabel := widget.NewLabel("Welcome!")
-	content := container.NewVBox(welcomeLabel)
+	mailIconRes, err := fyne.LoadResourceFromPath("../../assets/email_icon.png")
+	if err != nil {
+		log.Printf("Failed to load icon: %v", err)
+	}
 
-	w.SetContent(content)
+	sendIconRes, err := fyne.LoadResourceFromPath("../../assets/send_icon.png")
+	if err != nil {
+		log.Printf("Failed to load icon: %v", err)
+	}
+
+	tabs := container.NewAppTabs(
+		container.NewTabItemWithIcon(" IMAP", mailIconRes, widget.NewLabel("Просмотр почты")),
+		container.NewTabItemWithIcon(" SMTP", sendIconRes, widget.NewLabel("Отправка сообщения")),
+	)
+	tabs.SetTabLocation(container.TabLocationTop)
+
+	w.SetContent(tabs)
 }
 
 func showPopUp(w fyne.Window, message string, delay time.Duration) {
