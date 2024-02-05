@@ -5,6 +5,7 @@ go 1.20
 require (
 	fyne.io/fyne/v2 v2.4.3
 	github.com/emersion/go-imap/v2 v2.0.0-alpha.8
+	github.com/mnako/letters v0.2.2
 )
 
 require (
