@@ -194,11 +194,11 @@ func imapView(c *imapclient.Client) *fyne.Container {
 			subjectLabel := container.Objects[1].(*widget.Label)
 
 			// Устанавливаем текст для лейблов
-			subjectLabel.SetText(trimSpaces(truncateMessage(messages[id].Headers.Subject, 50))) // Пример использования функций trimSpaces и truncateMessage
+			subjectLabel.SetText(trimSpaces(truncateMessage(messages[id].Headers.Subject, 100))) // Пример использования функций trimSpaces и truncateMessage
 			if len(messages[id].Headers.From) > 0 {
-				fromLabel.SetText(trimSpaces(messages[id].Headers.From[0].Name))
+				fromLabel.SetText("✉ " + trimSpaces(messages[id].Headers.From[0].Name))
 			} else {
-				fromLabel.SetText("Неизвестный отправитель")
+				fromLabel.SetText("✉ Неизвестный отправитель")
 			}
 
 			now := time.Now()
