@@ -2,13 +2,56 @@ package gui
 
 import (
 	"bytes"
+	"emailclient/pkg/imapagent"
+	"emailclient/pkg/smtpagent"
 	"log"
 	"regexp"
 	"strings"
+	"time"
 
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/dialog"
+	"fyne.io/fyne/v2/widget"
 	"github.com/emersion/go-imap/v2/imapclient"
 	"github.com/mnako/letters"
 )
+
+func updateMessages(c *imapclient.Client) {
+	msgs, err := imapagent.FetchInboxMessages(c, limit, offset)
+	if err != nil {
+		log.Printf("Failed to fetch inbox messages: %v", err)
+	}
+	offset += 31
+
+	parsedMessages := parseMessagesBody(msgs)
+	messages = append(messages, parsedMessages...)
+}
+
+func loginFunc(w fyne.Window, c *imapclient.Client, username string, password string) {
+	if username == "" || password == "" {
+		log.Printf("Login failed: empty username or password")
+		showPopUp(w, "Пустое поле", 1500*time.Millisecond)
+		return
+	}
+
+	err := imapagent.Login(username, password, c)
+	if err != nil {
+		dialog.ShowError(err, w)
+		return
+	}
+
+	smtpagent.SetCredentials(username, password)
+	showMainContent(w, c)
+}
+
+func showPopUp(w fyne.Window, message string, delay time.Duration) {
+	popUp := widget.NewPopUp(widget.NewLabel(message), w.Canvas())
+	popUp.Show()
+
+	time.AfterFunc(delay, func() {
+		popUp.Hide()
+	})
+}
 
 func parseMessagesBody(messages []*imapclient.FetchMessageBuffer) []letters.Email {
 	var emails []letters.Email
