@@ -200,7 +200,22 @@ func imapView(c *imapclient.Client) *fyne.Container {
 			} else {
 				fromLabel.SetText("Неизвестный отправитель")
 			}
-			dateLabel.SetText(messages[id].Headers.Date.Local().Format("02 Jan 2006"))
+
+			now := time.Now()
+			msgDate := messages[id].Headers.Date.Local()
+			// Переводим текущее время в UTC+2
+			loc, _ := time.LoadLocation("Europe/Kiev")
+			nowInLoc := now.In(loc)
+			msgDateInLoc := msgDate.In(loc)
+
+			// Проверяем, является ли дата сообщения сегодняшним днем
+			if nowInLoc.Format("02 Jan 2006") == msgDateInLoc.Format("02 Jan 2006") {
+				// Если сегодняшняя дата, отображаем время
+				dateLabel.SetText(msgDateInLoc.Format("15:04"))
+			} else {
+				// В других случаях оставляем дату
+				dateLabel.SetText(msgDateInLoc.Format("02 Jan 2006"))
+			}
 		},
 	)
 
